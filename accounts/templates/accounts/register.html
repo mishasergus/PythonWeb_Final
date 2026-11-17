@@ -1,0 +1,21 @@
+{% extends "problems/base.html" %}
+
+{% block title %}Create account{% endblock %}
+
+{% block content %}
+<div class="auth-layout">
+    <section class="auth-card">
+        <div class="auth-icon">✦</div><span class="eyebrow">LET’S GET STARTED</span><h1>Make room for better support.</h1><p class="auth-intro">Create your account and keep all your requests in one place.</p>
+        <form method="post" class="styled-form">
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="notice notice-error">{{ form.non_field_errors }}</div>{% endif %}
+            {% for field in form %}
+                <div class="form-field{% if field.errors %} has-error{% endif %}"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<small class="field-help">{{ field.help_text|safe }}</small>{% endif %}{% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</div>
+            {% endfor %}
+            <button class="button button-primary button-large button-full auth-submit" type="submit">Create account <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="auth-switch">Already have an account? <a href="{% url 'accounts:login' %}">Sign in</a></p>
+    </section>
+    <aside class="auth-aside"><span class="aside-icon">✳</span><h2>From “I need help” to “all sorted.”</h2><p>Submit a request in a few steps and follow every update from your personal workspace.</p><div class="auth-aside-mark">S<span>.</span></div></aside>
+</div>
+{% endblock %}

@@ -3,7 +3,10 @@ from django.db.models import Case, When, IntegerField
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django.db.models import Count
 
+def select_user(user_id):
+    return CustomUser.objects.get(id=user_id)
 
 def select_performers():
     return CustomUser.objects.filter(applications_to_do__isnull=False).distinct()
@@ -122,3 +125,31 @@ def select_application_comments(application, user):
         comments = comments.filter(is_viewable=True)
 
     return comments
+
+def select_agents():
+    return CustomUser.objects.filter(role=CustomUser.Role.AGENT)
+
+
+def get_agent_resolved_count(agent):
+    return Application.objects.filter(performer=agent,
+                                      status__in=[Application.Status.RESOLVED, Application.Status.CLOSED]).count()
+
+
+def get_manager_statistics():
+    statuses_stats = Application.objects.values('status').annotate(count=Count('id'))
+
+    agents_stats = CustomUser.objects.filter(role=CustomUser.Role.AGENT).annotate(
+        applications_count=Count(
+            'applications_to_do',
+            filter=~Q(applications_to_do__status__in=[
+                Application.Status.RESOLVED,
+                Application.Status.CLOSED,
+                Application.Status.REJECTED,
+            ]),
+        )
+    ).values('username', 'applications_count')
+
+    return {
+        "statuses_stats": statuses_stats,
+        "agents_stats": agents_stats,
+    }

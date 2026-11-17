@@ -1,0 +1,26 @@
+{% extends "problems/base.html" %}
+
+{% block title %}{% if application %}Edit request{% else %}New request{% endif %}{% endblock %}
+
+{% block content %}
+<div class="form-layout">
+    <a class="back-link" href="{% if application %}{% url 'application_detail' application.id %}{% else %}{% url 'applications_list' %}{% endif %}">← Back to {% if application %}request{% else %}requests{% endif %}</a>
+    <section class="form-card">
+        <div class="form-card-heading"><span class="eyebrow">{% if application %}REQUEST DETAILS{% else %}LET’S GET THIS SORTED{% endif %}</span><h1>{% if application %}Update your request{% else %}What can we help with?{% endif %}</h1><p>Add a few details so our team can get you to the right solution.</p></div>
+        <form method="post" class="styled-form">
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="field-errors">{{ form.non_field_errors }}</div>{% endif %}
+            {% for field in form %}
+                <div class="form-field{% if field.errors %} has-error{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="required-mark">*</span>{% endif %}</label>
+                    {{ field }}
+                    {% if field.help_text %}<small class="field-help">{{ field.help_text|safe }}</small>{% endif %}
+                    {% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+                </div>
+            {% endfor %}
+            <div class="form-footer"><span><span class="required-mark">*</span> Required fields</span><button class="button button-primary button-large" type="submit">{% if application %}Save changes{% else %}Submit request{% endif %} <span aria-hidden="true">→</span></button></div>
+        </form>
+    </section>
+    <aside class="form-aside"><span class="aside-icon">✳</span><h2>A little detail goes a long way.</h2><p>Include what you were trying to do, what happened, and anything you’ve already tried. It helps us resolve things faster.</p><div class="aside-divider"></div><span class="aside-tip-label">WHAT HAPPENS NEXT</span><div class="aside-step"><span>01</span><p>Your request is added to the queue.</p></div><div class="aside-step"><span>02</span><p>A team member reviews and picks it up.</p></div><div class="aside-step"><span>03</span><p>Follow updates and replies in your workspace.</p></div></aside>
+</div>
+{% endblock %}

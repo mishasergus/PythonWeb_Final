@@ -1,0 +1,48 @@
+{% extends "problems/base.html" %}
+
+{% block title %}Requests{% endblock %}
+
+{% block content %}
+<section class="page-heading page-heading-row">
+    <div><span class="eyebrow">SUPPORT WORKSPACE</span><h1>Requests</h1><p>Track progress, follow up, and find what you need.</p></div>
+    <div class="page-heading-actions">
+        {% if user.role == "manager" %}<a class="button button-secondary" href="{% url 'create_application_category' %}"><span aria-hidden="true">＋</span> New category</a>{% endif %}
+        {% if user.role == "client" %}<a class="button button-primary" href="{% url 'create_application' %}"><span aria-hidden="true">＋</span> New request</a>{% endif %}
+    </div>
+</section>
+
+<form class="filter-panel" method="get">
+    <div class="filter-search"><label for="request-search">Search requests</label><input id="request-search" type="search" name="q" value="{{ query }}" placeholder="Try a title or keyword"></div>
+    <div class="filter-field"><label for="status-filter">Status</label><select id="status-filter" name="status"><option value="">All statuses</option>{% for value, label in statuses %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+    <div class="filter-field"><label for="priority-filter">Priority</label><select id="priority-filter" name="priority"><option value="">All priorities</option>{% for value, label in priorities %}<option value="{{ value }}" {% if priority == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+    <div class="filter-field"><label for="category-filter">Category</label><select id="category-filter" name="category"><option value="">All categories</option>{% for item in categories %}<option value="{{ item.id }}" {% if category == item.id|stringformat:"s" %}selected{% endif %}>{{ item.name }}</option>{% endfor %}</select></div>
+    <div class="filter-field"><label for="date-filter">Created on</label><input id="date-filter" type="date" name="created_date" value="{{ created_date }}"></div>
+    <div class="filter-field"><label for="sort-filter">Sort by</label><select id="sort-filter" name="order_by"><option value="date" {% if order_by == "date" or not order_by %}selected{% endif %}>Date</option><option value="priority" {% if order_by == "priority" %}selected{% endif %}>Priority</option></select></div>
+    <div class="filter-field"><label for="direction-filter">Direction</label><select id="direction-filter" name="order_direction"><option value="ASC" {% if order_direction == "ASC" or not order_direction %}selected{% endif %}>Oldest first</option><option value="DESC" {% if order_direction == "DESC" %}selected{% endif %}>Newest first</option></select></div>
+    <div class="filter-actions"><button class="button button-secondary" type="submit">Filter</button><a class="button button-quiet" href="{% url 'applications_list' %}">Clear</a></div>
+    {% if user.role == "manager" %}
+        <div class="filter-field filter-manager"><label for="performer-filter">Assigned to</label><select id="performer-filter" name="performer"><option value="">Anyone</option>{% for person in performers %}<option value="{{ person.username }}" {% if performer == person.username %}selected{% endif %}>{{ person.username }}</option>{% endfor %}</select></div>
+    {% endif %}
+</form>
+
+<section class="table-card">
+    <div class="table-heading"><div><h2>All requests</h2><p>{{ applications|length }} result{{ applications|length|pluralize }}</p></div><span class="table-heading-mark">✳</span></div>
+    {% if applications %}
+        <div class="request-list">
+            <div class="request-row request-row-labels"><span>Request</span><span>Category</span><span>Priority</span><span>Status</span><span>Created</span><span></span></div>
+            {% for application in applications %}
+                <a class="request-row" href="{% url 'application_detail' application.id %}">
+                    <span class="request-title-cell"><span class="request-symbol">↗</span><span><strong>{{ application.name }}</strong><small>{% if user.role != "client" %}by {{ application.creator.username }}{% else %}Request #{{ application.id }}{% endif %}</small></span></span>
+                    <span class="request-category">{{ application.category.name }}</span>
+                    <span><span class="priority-label priority-{{ application.priority }}">{{ application.get_priority_display }}</span></span>
+                    <span><span class="status-pill status-{{ application.status }}">{{ application.get_status_display }}</span></span>
+                    <span class="request-date">{{ application.created_at|date:"M j, Y" }}</span>
+                    <span class="row-arrow" aria-hidden="true">→</span>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state"><span class="empty-icon">⌕</span><h3>No requests found</h3><p>Try changing your filters{% if user.role == "client" %}, or create a new request to get started{% endif %}.</p>{% if user.role == "client" %}<a class="button button-primary" href="{% url 'create_application' %}">Create a request</a>{% endif %}</div>
+    {% endif %}
+</section>
+{% endblock %}

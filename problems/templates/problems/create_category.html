@@ -1,0 +1,32 @@
+{% extends "problems/base.html" %}
+
+{% block title %}New category{% endblock %}
+
+{% block content %}
+<div class="form-layout assignment-layout">
+    <a class="back-link" href="{% url 'applications_list' %}">← Back to requests</a>
+    <section class="form-card">
+        <div class="form-card-heading">
+            <span class="eyebrow">REQUEST SETTINGS</span>
+            <h1>Create a category</h1>
+            <p>Add a category to help organize incoming support requests.</p>
+        </div>
+        <form method="post" class="styled-form">
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="field-errors">{{ form.non_field_errors }}</div>{% endif %}
+            {% for field in form %}
+                <div class="form-field{% if field.errors %} has-error{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="required-mark">*</span>{% endif %}</label>
+                    {{ field }}
+                    {% if field.help_text %}<small class="field-help">{{ field.help_text|safe }}</small>{% endif %}
+                    {% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}
+                </div>
+            {% endfor %}
+            <div class="form-footer">
+                <span><span class="required-mark">*</span> Required fields</span>
+                <button class="button button-primary button-large" type="submit">Create category <span aria-hidden="true">→</span></button>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

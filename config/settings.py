@@ -130,3 +130,5 @@ MAILERS = {
 }
 
 AUTH_USER_MODEL = 'Shared_models.CustomUser'
+
+LOGIN_REDIRECT_URL = 'profile'

@@ -1,0 +1,60 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f7fb">
+    <title>{% block title %}Support Desk{% endblock %} · Support Desk</title>
+    <link rel="stylesheet" href="{% static 'problems/css/site.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="{% url 'home' %}" aria-label="Support Desk home">
+                <span class="brand-mark">S</span>
+                <span>support<span class="brand-light">desk</span></span>
+            </a>
+            <nav class="main-nav" aria-label="Main navigation">
+                <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'applications_list' %}" class="{% if request.resolver_match.url_name == 'applications_list' or request.resolver_match.url_name == 'application_detail' %}active{% endif %}">Requests</a>
+                    <a href="{% url 'profile' %}" class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">My workspace</a>
+                {% endif %}
+            </nav>
+            <div class="header-actions">
+                {% if user.is_authenticated %}
+                    <a class="user-chip" href="{% url 'profile' %}">
+                        <span class="avatar">{{ user.username|first|upper }}</span>
+                        <span class="user-chip-name">{{ user.username }}</span>
+                    </a>
+                    <form action="{% url 'accounts:logout' %}" method="post">
+                        {% csrf_token %}
+                        <button class="button button-quiet button-small" type="submit">Sign out</button>
+                    </form>
+                {% else %}
+                    <a class="button button-quiet button-small" href="{% url 'accounts:login' %}">Sign in</a>
+                    <a class="button button-primary button-small" href="{% url 'accounts:register' %}">Create account</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        {% if messages %}
+            <div class="message-stack" aria-live="polite">
+                {% for message in messages %}
+                    <div class="notice notice-{{ message.tags|default:'info' }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <span>Support Desk</span>
+            <span>Here to help you keep work moving.</span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -25,7 +25,7 @@ def client_required(view_func):
     @wraps(view_func)
     @login_required
     def wrapper(request, *args, **kwargs):
-        if request.user.role != CustomUser.Role.CLIENT:
+        if request.user.role not in [CustomUser.Role.CLIENT, CustomUser.Role.MANAGER]:
             raise PermissionDenied("Доступ дозволено лише клієнтам")
         return view_func(request, *args, **kwargs)
     return wrapper

@@ -1,0 +1,22 @@
+{% extends "problems/base.html" %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block content %}
+<div class="auth-layout">
+    <section class="auth-card">
+        <div class="auth-icon">↗</div><span class="eyebrow">GOOD TO SEE YOU</span><h1>Welcome back.</h1><p class="auth-intro">Sign in to pick up where you left off.</p>
+        {% if form.errors %}<div class="notice notice-error">Those details didn’t match. Please try again.</div>{% endif %}
+        <form method="post" class="styled-form">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
+            {% for field in form %}
+                <div class="form-field{% if field.errors %} has-error{% endif %}"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</div>
+            {% endfor %}
+            <button class="button button-primary button-large button-full auth-submit" type="submit">Sign in <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="auth-switch">New to Support Desk? <a href="{% url 'accounts:register' %}">Create an account</a></p>
+    </section>
+    <aside class="auth-aside"><span class="aside-icon">✳</span><h2>Good support makes all the difference.</h2><p>One place to ask for help, keep up with progress, and get back to what matters.</p><div class="auth-aside-mark">S<span>.</span></div></aside>
+</div>
+{% endblock %}

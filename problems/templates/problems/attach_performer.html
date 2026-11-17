@@ -1,0 +1,17 @@
+{% extends "problems/base.html" %}
+
+{% block title %}Assign request{% endblock %}
+
+{% block content %}
+<div class="form-layout assignment-layout">
+    <a class="back-link" href="{% url 'application_detail' application.id %}">← Back to request</a>
+    <section class="form-card">
+        <div class="form-card-heading"><span class="eyebrow">TEAM WORKFLOW</span><h1>Choose a teammate</h1><p>Assign <strong>{{ application.name }}</strong> to someone who can take it forward.</p></div>
+        <form method="post" class="styled-form">
+            {% csrf_token %}
+            <div class="form-field"><label for="agent-select">Support teammate<span class="required-mark">*</span></label><select id="agent-select" name="agent_id" required><option value="">Select a teammate</option>{% for person in users %}<option value="{{ person.id }}">{{ person.username }}</option>{% endfor %}</select></div>
+            <div class="form-footer"><span>Assignment can be changed later.</span><button class="button button-primary button-large" type="submit">Assign request <span aria-hidden="true">→</span></button></div>
+        </form>
+    </section>
+</div>
+{% endblock %}

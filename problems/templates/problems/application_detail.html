@@ -1,0 +1,61 @@
+{% extends "problems/base.html" %}
+
+{% block title %}{{ application.name }}{% endblock %}
+
+{% block content %}
+<div class="detail-topline"><a class="back-link" href="{% url 'applications_list' %}">← All requests</a><span class="detail-id">REQUEST #{{ application.id }}</span></div>
+<div class="detail-layout">
+    <section class="detail-main">
+        <div class="detail-card">
+            <div class="detail-title-row"><div><div class="detail-badges"><span class="status-pill status-{{ application.status }}">{{ application.get_status_display }}</span><span class="priority-label priority-{{ application.priority }}">{{ application.get_priority_display }} priority</span></div><h1>{{ application.name }}</h1></div><span class="detail-spark">✳</span></div>
+            <div class="detail-meta"><span>Filed by <strong>{{ application.creator.username }}</strong></span><span>{{ application.created_at|date:"M j, Y · H:i" }}</span></div>
+            <div class="detail-description">{{ application.description|default:"No description was provided."|linebreaksbr }}</div>
+            {% if user.role == "client" and application.status != "closed" and application.status != "rejected" %}
+                <div class="detail-actions"><a class="button button-secondary" href="{% url 'edit_application' application.id %}">Edit request</a></div>
+            {% endif %}
+        </div>
+
+        <section class="conversation-card">
+            <div class="conversation-heading"><div><h2>Conversation</h2><p>Messages and updates about this request</p></div><span class="conversation-count">{{ comments|length }}</span></div>
+            {% if comments %}
+                <div class="comment-list">
+                    {% for comment in comments %}
+                        <article class="comment-item">
+                            <span class="avatar comment-avatar">{% if comment.creator.username %}{{ comment.creator.username|first|upper }}{% else %}?{% endif %}</span>
+                            <div class="comment-content"><div class="comment-byline"><strong>{{ comment.creator.username }}</strong>{% if not comment.is_viewable %}<span class="internal-tag">Internal note</span>{% endif %}<time>{{ comment.created_at|date:"M j · H:i" }}</time></div><p>{{ comment.text|linebreaksbr }}</p></div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="conversation-empty"><span>✦</span><p>No messages yet. Start the conversation below.</p></div>
+            {% endif %}
+            <form method="post" class="reply-form">
+                {% csrf_token %}
+                <label for="reply-text">Add a reply</label>
+                <textarea id="reply-text" name="text" rows="3" placeholder="Write a message..." required></textarea>
+                <div class="reply-footer"><span>Keep it clear and kind.</span><button class="button button-primary" name="add_comment" type="submit">Send reply <span aria-hidden="true">→</span></button></div>
+            </form>
+            {% if user.role != "client" %}
+                <form method="post" class="internal-note-form">
+                    {% csrf_token %}
+                    <label for="internal-text">Add an internal note</label>
+                    <textarea id="internal-text" name="text" rows="2" placeholder="Only the support team can see this..." required></textarea>
+                    <button class="button button-secondary button-small" name="add_hide_comment" type="submit">Add internal note</button>
+                </form>
+            {% endif %}
+        </section>
+    </section>
+
+    <aside class="detail-sidebar">
+        <section class="sidebar-card"><span class="sidebar-label">REQUEST DETAILS</span><div class="sidebar-detail"><span>Category</span><strong>{{ application.category.name }}</strong></div><div class="sidebar-detail"><span>Priority</span><strong><span class="priority-label priority-{{ application.priority }}">{{ application.get_priority_display }}</span></strong></div><div class="sidebar-detail"><span>Assigned to</span><strong>{% if application.performer %}{{ application.performer.username }}{% else %}Unassigned{% endif %}</strong></div><div class="sidebar-detail"><span>Last updated</span><strong>{{ application.updated_at|date:"M j, Y" }}</strong></div></section>
+        {% if user.role != "client" %}
+            <section class="sidebar-card sidebar-workflow"><span class="sidebar-label">TEAM ACTIONS</span>
+                {% if user.role == "manager" %}<a class="button button-secondary button-full" href="{% url 'attach_performer' application.id %}">Assign a teammate <span aria-hidden="true">→</span></a>{% endif %}
+                {% if application.status != "closed" and application.status != "rejected" and application.status != "resolved" %}<form method="post">{% csrf_token %}<button class="button button-primary button-full" type="submit" name="next_status">Move to next status <span aria-hidden="true">→</span></button></form>{% endif %}
+                {% if application.status != "closed" and application.status != "rejected" %}<form method="post">{% csrf_token %}<button class="button button-danger button-full" type="submit" name="reject_application">Reject request</button></form>{% endif %}
+            </section>
+        {% endif %}
+        <div class="sidebar-help"><span>✦</span><p>Need to add something? Leave a reply and your team will see it.</p></div>
+    </aside>
+</div>
+{% endblock %}

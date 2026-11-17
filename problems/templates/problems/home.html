@@ -1,0 +1,50 @@
+{% extends "problems/base.html" %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <span class="eyebrow"><span class="eyebrow-dot"></span> A better way to get help</span>
+        <h1>Good work starts with <span>the right support.</span></h1>
+        <p class="hero-description">Tell us what you need. We’ll get it to the right people and keep you in the loop from start to finish.</p>
+        <div class="hero-actions">
+            {% if user.is_authenticated %}
+                {% if user.role == "client" %}
+                    <a class="button button-primary button-large" href="{% url 'create_application' %}">Create a request <span aria-hidden="true">→</span></a>
+                {% endif %}
+                <a class="button button-secondary button-large" href="{% url 'applications_list' %}">Browse requests</a>
+            {% else %}
+                <a class="button button-primary button-large" href="{% url 'accounts:register' %}">Get started <span aria-hidden="true">→</span></a>
+                <a class="button button-secondary button-large" href="{% url 'accounts:login' %}">Sign in</a>
+            {% endif %}
+        </div>
+        <div class="hero-proof"><span class="proof-check">✓</span> Clear updates <span class="proof-divider">·</span> One place to follow up</div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+        <div class="art-glow"></div>
+        <div class="orbit orbit-one"></div>
+        <div class="orbit orbit-two"></div>
+        <div class="art-card art-card-main">
+            <div class="art-card-top"><span class="art-icon">✳</span><span class="status-pill status-progress">In progress</span></div>
+            <div class="art-lines"><span></span><span></span><span></span></div>
+            <div class="art-card-foot"><span class="avatar avatar-purple">J</span><span class="avatar avatar-orange">M</span><span class="art-foot-label">Your team is on it</span><span class="art-arrow">↗</span></div>
+        </div>
+        <div class="art-note"><span class="note-check">✓</span><span><strong>Request received</strong><small>We’ll keep you updated</small></span></div>
+        <div class="art-sparkle sparkle-one">✦</div>
+        <div class="art-sparkle sparkle-two">✦</div>
+    </div>
+</section>
+
+<section class="feature-section">
+    <div class="section-heading">
+        <div><span class="eyebrow">MADE FOR MOMENTUM</span><h2>Support, without the runaround.</h2></div>
+        <p>Everything you need to move from question to resolution, all in one place.</p>
+    </div>
+    <div class="feature-grid">
+        <article class="feature-card"><span class="feature-icon icon-lilac">↗</span><h3>Easy to get started</h3><p>Share the details once and let the right team take it from there.</p></article>
+        <article class="feature-card"><span class="feature-icon icon-mint">◎</span><h3>Always in the loop</h3><p>See request status and conversations whenever you need them.</p></article>
+        <article class="feature-card"><span class="feature-icon icon-peach">✳</span><h3>People, not a maze</h3><p>Your request is assigned and handled by a real support team.</p></article>
+    </div>
+</section>
+{% endblock %}
